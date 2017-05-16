@@ -153,7 +153,7 @@ public class CqlStatementBuilder {
      * @return {@code true} if it is, {@code false} if not.
      */
     protected boolean isSingleLineComment(String line) {
-        return line.startsWith("--");
+        return line.startsWith("--") || line.startsWith("//");
     }
 
     /**
@@ -213,7 +213,7 @@ public class CqlStatementBuilder {
      * @return The simplified line.
      */
     protected String simplifyLine(String line) {
-        return removeEscapedQuotes(line).replace("--", " -- ").replaceAll("\\s+", " ").trim().toUpperCase();
+        return removeEscapedQuotes(line).replace("--", " -- ").replace("//", " // ").replaceAll("\\s+", " ").trim().toUpperCase();
     }
 
     /**
