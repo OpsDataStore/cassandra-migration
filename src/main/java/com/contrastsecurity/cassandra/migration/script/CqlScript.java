@@ -20,6 +20,7 @@ import com.contrastsecurity.cassandra.migration.logging.Log;
 import com.contrastsecurity.cassandra.migration.logging.LogFactory;
 import com.contrastsecurity.cassandra.migration.utils.StringUtils;
 import com.contrastsecurity.cassandra.migration.utils.scanner.Resource;
+import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Session;
 
 import java.io.BufferedReader;
@@ -92,7 +93,10 @@ public class CqlScript {
     public void execute(final Session session) {
         for (String cqlStatement : cqlStatements) {
             LOG.debug("Executing CQL: " + cqlStatement);
-            session.execute(cqlStatement);
+            ResultSet rs = session.execute(cqlStatement);
+            if (!rs.getExecutionInfo().isSchemaInAgreement()) {
+                LOG.error("Schemas not in agreement after executing CQL: " + cqlStatement);
+            }
         }
     }
 

@@ -7,7 +7,8 @@ public class Cluster {
         CONTACTPOINTS(PROPERTY_PREFIX + "contactpoints", "Comma separated values of node IP addresses"),
         PORT(PROPERTY_PREFIX + "port", "CQL native transport port"),
         USERNAME(PROPERTY_PREFIX + "username", "Username for password authenticator"),
-        PASSWORD(PROPERTY_PREFIX + "password", "Password for password authenticator");
+        PASSWORD(PROPERTY_PREFIX + "password", "Password for password authenticator"),
+        AGREEMENT_TO(PROPERTY_PREFIX + "schemaAgreementTimeout", "Number of seconds to wait for schema agreement before timing out");
 
         private String name;
         private String description;
@@ -30,6 +31,7 @@ public class Cluster {
     private int port = 9042;
     private String username;
     private String password;
+    private int agreementTimeout = 240;
 
     public Cluster() {
         String contactpointsP = System.getProperty(ClusterProperty.CONTACTPOINTS.getName());
@@ -47,6 +49,10 @@ public class Cluster {
         String passwordP = System.getProperty(ClusterProperty.PASSWORD.getName());
         if (null != passwordP && passwordP.trim().length() != 0)
             this.password = passwordP;
+
+        String agreementP = System.getProperty(ClusterProperty.AGREEMENT_TO.getName());
+        if (null != agreementP && agreementP.trim().length() != 0)
+            this.agreementTimeout = Integer.parseInt(agreementP);
     }
 
     public String[] getContactpoints() {
@@ -80,4 +86,8 @@ public class Cluster {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public void setAgreementTimeout(int timeout) { this.agreementTimeout = timeout; }
+
+    public int getAgreementTimeout() { return this.agreementTimeout; }
 }

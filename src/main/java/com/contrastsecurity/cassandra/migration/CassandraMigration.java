@@ -152,6 +152,8 @@ public class CassandraMigration {
                     throw new IllegalArgumentException("Password must be provided with username.");
                 }
             }
+            builder.withMaxSchemaAgreementWaitSeconds(keyspace.getCluster().getAgreementTimeout());
+            LOG.debug("Setting maxSchemaAgreementWaitSeconds to " + keyspace.getCluster().getAgreementTimeout());
             cluster = builder.build();
 
             Metadata metadata = cluster.getMetadata();
