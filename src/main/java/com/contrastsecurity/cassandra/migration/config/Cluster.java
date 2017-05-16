@@ -8,7 +8,8 @@ public class Cluster {
         PORT(PROPERTY_PREFIX + "port", "CQL native transport port"),
         USERNAME(PROPERTY_PREFIX + "username", "Username for password authenticator"),
         PASSWORD(PROPERTY_PREFIX + "password", "Password for password authenticator"),
-        AGREEMENT_TO(PROPERTY_PREFIX + "schemaAgreementTimeout", "Number of seconds to wait for schema agreement before timing out");
+        AGREEMENT_TO(PROPERTY_PREFIX + "schemaAgreementTimeout", "Number of seconds to wait for schema agreement before timing out"),
+        READ_TO(PROPERTY_PREFIX + "readTimeout", "Number of seconds to wait for read before timing out.");
 
         private String name;
         private String description;

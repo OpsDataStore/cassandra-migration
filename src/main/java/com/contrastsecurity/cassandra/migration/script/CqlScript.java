@@ -20,8 +20,11 @@ import com.contrastsecurity.cassandra.migration.logging.Log;
 import com.contrastsecurity.cassandra.migration.logging.LogFactory;
 import com.contrastsecurity.cassandra.migration.utils.StringUtils;
 import com.contrastsecurity.cassandra.migration.utils.scanner.Resource;
+import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Session;
+import com.datastax.driver.core.SimpleStatement;
+import sun.java2d.pipe.SpanShapeRenderer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -48,13 +51,19 @@ public class CqlScript {
     private final Resource resource;
 
     /**
+     * Read timeout for this statement
+     */
+    private final Integer readTimeout;
+
+    /**
      * Creates a new cql script from this source.
      *
      * @param cqlScriptSource The cql script as a text block with all placeholders already replaced.
      */
-    public CqlScript(String cqlScriptSource) {
+    public CqlScript(String cqlScriptSource, Integer readTimeout) {
         this.cqlStatements = parse(cqlScriptSource);
         this.resource = null;
+        this.readTimeout = readTimeout;
     }
 
     /**
@@ -63,11 +72,12 @@ public class CqlScript {
      * @param cqlScriptResource The resource containing the statements.
      * @param encoding          The encoding to use.
      */
-    public CqlScript(Resource cqlScriptResource, String encoding) {
+    public CqlScript(Resource cqlScriptResource, String encoding, Integer readTimeout) {
         String cqlScriptSource = cqlScriptResource.loadAsString(encoding);
         this.cqlStatements = parse(cqlScriptSource);
 
         this.resource = cqlScriptResource;
+        this.readTimeout = readTimeout;
     }
 
     /**
@@ -91,9 +101,12 @@ public class CqlScript {
      * @param session Cassandra session
      */
     public void execute(final Session session) {
+        Session localSession = session;
         for (String cqlStatement : cqlStatements) {
-            LOG.debug("Executing CQL: " + cqlStatement);
-            ResultSet rs = session.execute(cqlStatement);
+            LOG.debug("Executing CQL: " + cqlStatement + " (reeadTimeout: " + readTimeout + ")");
+            SimpleStatement stmt = new SimpleStatement(cqlStatement);
+            stmt.setReadTimeoutMillis(this.readTimeout * 1000);
+            ResultSet rs = localSession.execute(stmt);
             if (!rs.getExecutionInfo().isSchemaInAgreement()) {
                 LOG.error("Schemas not in agreement after executing CQL: " + cqlStatement);
             }

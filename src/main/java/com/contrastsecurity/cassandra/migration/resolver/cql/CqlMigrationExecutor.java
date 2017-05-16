@@ -1,5 +1,6 @@
 package com.contrastsecurity.cassandra.migration.resolver.cql;
 
+import com.contrastsecurity.cassandra.migration.config.Cluster;
 import com.contrastsecurity.cassandra.migration.resolver.MigrationExecutor;
 import com.contrastsecurity.cassandra.migration.script.CqlScript;
 import com.contrastsecurity.cassandra.migration.utils.scanner.Resource;
@@ -23,6 +24,11 @@ public class CqlMigrationExecutor implements MigrationExecutor {
     private final String encoding;
 
     /**
+     * Read timeout for the CQL statement in seconds
+     */
+    private Integer readTimeout = 60;
+
+    /**
      * Creates a new cql script migration based on this cql script.
      *
      * @param cqlScriptResource The resource containing the cql script.
@@ -31,11 +37,17 @@ public class CqlMigrationExecutor implements MigrationExecutor {
     public CqlMigrationExecutor(Resource cqlScriptResource, String encoding) {
         this.cqlScriptResource = cqlScriptResource;
         this.encoding = encoding;
+
+        //Check for override to readTimeout
+        String readP = System.getProperty(Cluster.ClusterProperty.READ_TO.getName());
+        if (null != readP && readP.trim().length() != 0)
+            this.readTimeout = Integer.parseInt(readP);
+
     }
 
     @Override
     public void execute(Session session) {
-        CqlScript cqlScript = new CqlScript(cqlScriptResource, encoding);
+        CqlScript cqlScript = new CqlScript(cqlScriptResource, encoding, readTimeout);
         cqlScript.execute(session);
     }
 }
