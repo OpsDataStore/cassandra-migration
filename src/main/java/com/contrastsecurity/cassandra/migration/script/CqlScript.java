@@ -110,11 +110,6 @@ public class CqlScript {
             if (!rs.getExecutionInfo().isSchemaInAgreement()) {
                 LOG.error("Schemas not in agreement after executing CQL: " + cqlStatement);
             }
-            //Test -- not sure this is staying
-            LOG.debug("Closing and reopening session...");
-            Cluster c = localSession.getCluster();
-            localSession.close();
-            localSession = c.connect();
         }
     }
 
