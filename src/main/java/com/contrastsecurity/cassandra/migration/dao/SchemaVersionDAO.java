@@ -202,7 +202,7 @@ public class SchemaVersionDAO {
     private int calculateInstalledRank() {
         Statement statement = new SimpleStatement(
                 "UPDATE " + keyspace.getName() + "." + tableName + COUNTS_TABLE_NAME_SUFFIX +
-                        " SET count = count + 1" +
+                        " SET count = count + 1 " +
                         "WHERE name = 'installed_rank';");
         session.execute(statement);
         Select select = QueryBuilder
